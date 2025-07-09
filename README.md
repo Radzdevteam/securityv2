@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
         // Security check
         SecurityChecker.validate(
             this,
-            "6924268D77DA70BD33C139F5D0345DA455EE9C61",
+            "69:24:26:8D:77:DA:70:BD:33:C1:39:F5:D0:34:5D:A4:55:EE:9C:61",
             "securityv2",
             "com.radzdev.securityv2"
         )
