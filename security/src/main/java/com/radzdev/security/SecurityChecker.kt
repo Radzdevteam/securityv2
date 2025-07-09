@@ -36,11 +36,26 @@ object SecurityChecker {
 
     private fun getCertificateFingerprint(activity: Activity): String {
         return try {
-            val packageInfo = activity.packageManager.getPackageInfo(
-                activity.packageName,
-                PackageManager.GET_SIGNATURES
-            )
-            val signature: Signature = packageInfo.signatures!![0]
+            val packageInfo = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                activity.packageManager.getPackageInfo(
+                    activity.packageName,
+                    PackageManager.GET_SIGNING_CERTIFICATES
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                activity.packageManager.getPackageInfo(
+                    activity.packageName,
+                    PackageManager.GET_SIGNATURES
+                )
+            }
+
+            val signature: Signature = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                packageInfo.signingInfo?.apkContentsSigners?.get(0) ?: packageInfo.signingInfo?.signingCertificateHistory?.get(0)!!
+            } else {
+                @Suppress("DEPRECATION")
+                packageInfo.signatures!![0]
+            }
+
             val cert = signature.toByteArray()
             val input = java.io.ByteArrayInputStream(cert)
             val cf = java.security.cert.CertificateFactory.getInstance("X509")
